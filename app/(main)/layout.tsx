@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import PrivateNavBar from "@/components/PrivateNavBar"
 
 export default function MainLayout({
