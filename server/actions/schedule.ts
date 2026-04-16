@@ -2,7 +2,7 @@
 
 'use server'
 import { fromZonedTime } from "date-fns-tz"
-import { db } from "@/drizzle/db"
+import { getDb } from "@/drizzle/db"
 import { ScheduleAvailabilityTable, ScheduleTable } from "@/drizzle/schema"
 import { scheduleFormSchema } from "@/schema/schedule"
 
@@ -24,6 +24,7 @@ export type FullSchedule = ScheduleRow & {
 
 // This function fetches the schedule (and its availabilities) for a given user from the database
 export async function getSchedule(userId: string): Promise<FullSchedule> {
+  const db = getDb()
   // Query the ScheduleTable for the first record that matches the user's ID
   // Also eagerly load the related 'availabilities' data
   const schedule = await db.query.ScheduleTable.findFirst({
@@ -44,6 +45,7 @@ export async function saveSchedule(
   unsafeData: z.infer<typeof scheduleFormSchema> // Accepts unvalidated form data
 ) {
   try {
+    const db = getDb()
     const userId = "admin" // Hardcoded admin user
 
     // Validate the incoming data against the schedule schema
@@ -109,6 +111,7 @@ export async function getValidTimesFromSchedule(
     timesInOrder: Date[], // All possible time slots to check
     event: { clerkUserId: string; durationInMinutes: number } // Event-specific data
 ) : Promise<Date[]> {
+  const db = getDb()
 
   const {clerkUserId: userId, durationInMinutes} = event
 

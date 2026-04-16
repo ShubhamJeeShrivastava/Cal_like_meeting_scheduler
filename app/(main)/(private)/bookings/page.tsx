@@ -1,13 +1,13 @@
-import { getBookings } from "@/server/actions/meetings";
+import { getBookings, type BookingRow } from "@/server/actions/meetings";
 import { CalendarRange, Clock, User, Mail } from "lucide-react";
 import { format, isFuture, isPast } from "date-fns";
 import { DeleteBookingButton } from "@/components/DeleteBookingButton";
 
 export default async function BookingsPage() {
-    const bookings = await getBookings();
+    const bookings: BookingRow[] = await getBookings();
 
-    const upcoming = bookings.filter(b => isFuture(b.startTime));
-    const past = bookings.filter(b => isPast(b.startTime));
+    const upcoming = bookings.filter((b: BookingRow) => isFuture(b.startTime));
+    const past = bookings.filter((b: BookingRow) => isPast(b.startTime));
 
     return (
         <section className="min-h-screen bg-[#0f0f10] text-[#ededed] p-10 font-sans">

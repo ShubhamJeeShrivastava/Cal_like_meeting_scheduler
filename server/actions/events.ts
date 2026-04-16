@@ -1,6 +1,6 @@
 'use server' // Marks this file as a Server Action - required for Next.js App Router
 
-import { db } from "@/drizzle/db";
+import { getDb } from "@/drizzle/db";
 import { EventTable } from "@/drizzle/schema";
 import { eventFormSchema } from "@/schema/events";
 
@@ -15,6 +15,7 @@ export async function createEvent(
     unsafeData: z.infer<typeof eventFormSchema> // Accepts raw event data validated by the zod schema
   ): Promise<void> {
     try {
+      const db = getDb()
       // Hardcoded admin user for assignment
       const userId = "admin"
   
@@ -47,6 +48,7 @@ export async function updateEvent(
     unsafeData: z.infer<typeof eventFormSchema> // Raw event data to validate and update
   ): Promise<void> {
     try {
+      const db = getDb()
       // Hardcoded admin user for assignment
       const userId = "admin"
   
@@ -86,6 +88,7 @@ export async function updateEvent(
       id: string // ID of the event to delete
     ): Promise<void> {
       try {
+        const db = getDb()
         // Hardcoded admin user for assignment
         const userId = "admin"
     
@@ -118,6 +121,7 @@ export async function updateEvent(
 
 // Async function to fetch all events (active and inactive) for a specific user
 export async function getEvents(clerkUserId: string): Promise<EventRow[]> {
+  const db = getDb()
   // Query the database for events where the clerkUserId matches
   const events = await db.query.EventTable.findMany({
     //where: — This defines a filter (a WHERE clause) for your query.
@@ -140,6 +144,7 @@ export async function getEvents(clerkUserId: string): Promise<EventRow[]> {
 
 // Fetch a specific event for a given user
 export async function getEvent(userId: string, eventId: string): Promise<EventRow | undefined> {
+  const db = getDb()
   const event = await db.query.EventTable.findFirst({
     where: ({ id, clerkUserId }, { and, eq }) =>
       and(eq(clerkUserId, userId), eq(id, eventId)), // Make sure the event belongs to the user
@@ -157,6 +162,7 @@ export type PublicEvent = Omit<EventRow, "isActive"> & { isActive: true }
 
 // Async function to fetch all active (public) events for a specific user
 export async function getPublicEvents(clerkUserId: string): Promise<PublicEvent[]> {
+  const db = getDb()
   // Query the database for events where:
   // - the clerkUserId matches
   // - the event is marked as active

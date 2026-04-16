@@ -68,14 +68,19 @@ export default function MeetingForm({
     async function onSubmit(values: z.infer<typeof meetingFormSchema>) {
         try {
         // Call the createMeeting action (assuming it handles success/failure internally)
-        const meetingData =  await createMeeting({
+        const result =  await createMeeting({
             ...values,
             eventId,
             clerkUserId,
         })
 
+            if (!result.ok) {
+              form.setError("root", { message: result.error })
+              return
+            }
+
             // Initialize the path variable to use it later in the finally block
-            const path = `/book/${meetingData.clerkUserId}/${meetingData.eventId}/success?startTime=${meetingData.startTime.toISOString()}`;
+            const path = `/book/${result.data.clerkUserId}/${result.data.eventId}/success?startTime=${result.data.startTime.toISOString()}`;
             router.push(path)
     
         } catch (error: any) {

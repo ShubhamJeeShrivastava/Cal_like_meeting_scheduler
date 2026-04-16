@@ -1,6 +1,6 @@
 'use server'
 
-import { db } from "@/drizzle/db";
+import { getDb } from "@/drizzle/db";
 import { MeetingTable } from "@/drizzle/schema";
 import { meetingActionSchema } from "@/schema/meetings";
 import { fromZonedTime } from "date-fns-tz";
@@ -10,13 +10,23 @@ import { z } from "zod";
 import { addMinutes } from "date-fns";
 import { eq, and } from "drizzle-orm";
 
+type CreateMeetingResult =
+  | {
+      ok: true
+      data: { clerkUserId: string; eventId: string; startTime: Date }
+    }
+  | { ok: false; error: string }
+
+export type BookingRow = typeof MeetingTable.$inferSelect
+
 // Server action to create a meeting and save it to the database
 export async function createMeeting(
   unsafeData: z.infer<typeof meetingActionSchema>
-) {
+) : Promise<CreateMeetingResult> {
   try {
+    const db = getDb()
     const { success, data } = meetingActionSchema.safeParse(unsafeData);
-    if (!success) throw new Error("Invalid data.");
+    if (!success) return { ok: false, error: "Invalid booking data." }
 
     // Find the event in the database
     const event = await db.query.EventTable.findFirst({
@@ -28,12 +38,12 @@ export async function createMeeting(
         ),
     });
 
-    if (!event) throw new Error("Event not found.");
+    if (!event) return { ok: false, error: "Event not found." }
 
     const startInTimezone = fromZonedTime(data.startTime, data.timezone);
 
     const validTimes = await getValidTimesFromSchedule([startInTimezone], event);
-    if (validTimes.length === 0) throw new Error("Selected time is not valid.");
+    if (validTimes.length === 0) return { ok: false, error: "Selected time is not available." }
 
     // Save the meeting to the database
     await db.insert(MeetingTable).values({
@@ -56,15 +66,20 @@ export async function createMeeting(
       eventName: event.name,
     });
 
-    return { clerkUserId: data.clerkUserId, eventId: data.eventId, startTime: data.startTime };
+    return { ok: true, data: { clerkUserId: data.clerkUserId, eventId: data.eventId, startTime: data.startTime } }
   } catch (error: any) {
-    console.error(`Error creating meeting: ${error.message || error}`);
-    throw new Error(`Failed to create meeting: ${error.message || error}`);
+    const message =
+      typeof error?.message === "string" && error.message.length > 0
+        ? error.message
+        : "Failed to save booking."
+    console.error(`Error creating meeting: ${message}`)
+    return { ok: false, error: message }
   }
 }
 
 // Server action to fetch all bookings for the admin user
 export async function getBookings() {
+  const db = getDb()
   const userId = "admin";
   return db.query.MeetingTable.findMany({
     where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
@@ -75,6 +90,7 @@ export async function getBookings() {
 // Server action to delete a booking
 export async function cancelMeeting(id: string) {
   try {
+    const db = getDb()
     const userId = "admin";
     
     const result = await db
