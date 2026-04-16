@@ -1,5 +1,8 @@
-<<<<<<< HEAD
 # Cal by Shubham
+
+## Live Demo
+
+[`https://cal-like-meeting-scheduler-by-shubham-jee.vercel.app/`](https://cal-like-meeting-scheduler-by-shubham-jee.vercel.app/)
 
 A high-performance, professional scheduling platform built for modern workflows. **Cal by Shubham** enables individuals and organizations to manage their availability, coordinate meetings, and streamline their booking process with a premium, focused user experience.
 
@@ -101,16 +104,3 @@ Contributions are welcome! If you have suggestions for new features or infrastru
 **Built with ❤️ by [Shubham Jee Shrivastava](https://github.com/ShubhamJeeShrivastava)**
 
 *This project was developed as a production-grade demonstration of full-stack engineering capabilities using modern web technologies.*
-=======
-# 📅 Build and Deploy a Calendly Clone
-
-This project-based course walks you through building a full-stack Calendly clone from scratch using **Next.js 15**, **Clerk** for authentication, **Tailwind CSS**, and a modern tech stack. 
-
-You’ll learn how to:
-- Create and manage event types
-- Implement user availability and scheduling
-- Handle full-stack logic using server actions
-- Deploy your app to the web using **Vercel**
-
-Perfect for developers looking to sharpen their full-stack skills with real-world functionality.
->>>>>>> 2e0718d628fae4b83897728854c04c1ac00b2043
