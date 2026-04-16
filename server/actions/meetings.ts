@@ -3,7 +3,6 @@
 import { getDb } from "@/drizzle/db";
 import { MeetingTable } from "@/drizzle/schema";
 import { meetingActionSchema } from "@/schema/meetings";
-import { fromZonedTime } from "date-fns-tz";
 import { getValidTimesFromSchedule } from "./schedule";
 import { createCalendarEvent } from "../google/googleCalendar";
 import { z } from "zod";
@@ -40,9 +39,11 @@ export async function createMeeting(
 
     if (!event) return { ok: false, error: "Event not found." }
 
-    const startInTimezone = fromZonedTime(data.startTime, data.timezone);
+    // `data.startTime` is already a concrete timestamp (UTC instant) chosen from the server-provided slots.
+    // Do not convert it again using timezone, otherwise it shifts and will fail validation.
+    const startTime = data.startTime
 
-    const validTimes = await getValidTimesFromSchedule([startInTimezone], event);
+    const validTimes = await getValidTimesFromSchedule([startTime], event);
     if (validTimes.length === 0) return { ok: false, error: "Selected time is not available." }
 
     // Save the meeting to the database
@@ -52,7 +53,7 @@ export async function createMeeting(
       guestName: data.guestName,
       guestEmail: data.guestEmail,
       guestNotes: data.guestNotes ?? null,
-      startTime: startInTimezone,
+      startTime,
       durationInMinutes: event.durationInMinutes,
       timezone: data.timezone,
       eventName: event.name,
@@ -61,7 +62,7 @@ export async function createMeeting(
     // Also try to create a Google Calendar event (stubbed out, won't fail)
     await createCalendarEvent({
       ...data,
-      startTime: startInTimezone,
+      startTime,
       durationInMinutes: event.durationInMinutes,
       eventName: event.name,
     });

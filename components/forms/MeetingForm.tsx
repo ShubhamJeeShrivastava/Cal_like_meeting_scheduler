@@ -60,8 +60,11 @@ export default function MeetingForm({
     const date = form.watch("date")
 
         // Convert valid times to the selected timezone
-    const validTimesInTimezone = useMemo(() => {
-        return validTimes.map(date => toZonedTime(date, timezone))
+    const timeOptions = useMemo(() => {
+        return validTimes.map(utcTime => ({
+          utcTime,
+          zonedTime: toZonedTime(utcTime, timezone),
+        }))
     }, [validTimes, timezone])
 
     // Handle form submission
@@ -170,8 +173,8 @@ export default function MeetingForm({
                               onSelect={field.onChange}
                               disabled={date =>
                                 // Only allow selecting dates that have available time slots
-                                !validTimesInTimezone.some(time =>
-                                  isSameDay(date, time)
+                                !timeOptions.some(({ zonedTime }) =>
+                                  isSameDay(date, zonedTime)
                                 )
                               }
                               initialFocus
@@ -210,14 +213,14 @@ export default function MeetingForm({
                           </FormControl>
                           <SelectContent>
                             {/* Show time options only for the selected day */}
-                            {validTimesInTimezone
-                              .filter(time => isSameDay(time, date))
-                              .map(time => (
+                            {timeOptions
+                              .filter(({ zonedTime }) => isSameDay(zonedTime, date))
+                              .map(({ utcTime, zonedTime }) => (
                                 <SelectItem
-                                  key={time.toISOString()}
-                                  value={time.toISOString()}
+                                  key={utcTime.toISOString()}
+                                  value={utcTime.toISOString()}
                                 >
-                                  {formatTimeString(time)}
+                                  {formatTimeString(zonedTime)}
                                 </SelectItem>
                               ))}
                           </SelectContent>
