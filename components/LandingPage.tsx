@@ -26,7 +26,7 @@ export default function LandingPage() {
                 {/* Left side texts */}
                 <div className="flex-1 max-w-xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#f6f6f6] border border-gray-200 rounded-full text-sm font-medium mb-6">
-                        Build by Shubham Jee Shrivastava
+                        Built by Shubham Jee Shrivastava
                     </div>
                     
                     <h1 className="text-[64px] lg:text-[76px] font-black leading-[1.02] tracking-tighter mb-6 text-[#111111]">
