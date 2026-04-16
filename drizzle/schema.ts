@@ -83,3 +83,36 @@ export const ScheduleAvailabilityRelations = relations(
       }),
     })
   )
+
+// Define the "meetings" table to persist booked meetings
+export const MeetingTable = pgTable(
+  "meetings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("eventId")
+      .notNull()
+      .references(() => EventTable.id, { onDelete: "cascade" }),
+    clerkUserId: text("clerkUserId").notNull(),
+    guestName: text("guestName").notNull(),
+    guestEmail: text("guestEmail").notNull(),
+    guestNotes: text("guestNotes"),
+    startTime: timestamp("startTime").notNull(),
+    durationInMinutes: integer("durationInMinutes").notNull(),
+    timezone: text("timezone").notNull(),
+    eventName: text("eventName").notNull(),
+    createdAt,
+    updatedAt,
+  },
+  table => ([
+    index("meetingUserIdIndex").on(table.clerkUserId),
+    index("meetingEventIdIndex").on(table.eventId),
+  ])
+)
+
+// Define relations: each meeting belongs to one event
+export const meetingRelations = relations(MeetingTable, ({ one }) => ({
+  event: one(EventTable, {
+    fields: [MeetingTable.eventId],
+    references: [EventTable.id],
+  }),
+}))

@@ -93,11 +93,11 @@ export default function EventForm({
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Event Name</FormLabel>
+                    <FormLabel className="text-[#939393] text-sm">Event Name</FormLabel>
                     <FormControl>
-                        <Input {...field} />
+                        <Input className="bg-[#0f0f10] border-[#333] text-white focus-visible:ring-1 focus-visible:ring-[#555]" {...field} />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-[#555] text-xs">
                         The name users will see when booking
                     </FormDescription>
                     <FormMessage />
@@ -111,11 +111,11 @@ export default function EventForm({
                 name="durationInMinutes"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Duration</FormLabel>
+                    <FormLabel className="text-[#939393] text-sm">Duration</FormLabel>
                     <FormControl>
-                        <Input type="number" {...field} />
+                        <Input className="bg-[#0f0f10] border-[#333] text-white focus-visible:ring-1 focus-visible:ring-[#555]" type="number" {...field} />
                     </FormControl>
-                    <FormDescription>In minutes</FormDescription>
+                    <FormDescription className="text-[#555] text-xs">In minutes</FormDescription>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -127,11 +127,11 @@ export default function EventForm({
                 name="description"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel className="text-[#939393] text-sm">Description</FormLabel>
                     <FormControl>
-                        <Textarea className="resize-none h-32" {...field} />
+                        <Textarea className="resize-none h-32 bg-[#0f0f10] border-[#333] text-white focus-visible:ring-1 focus-visible:ring-[#555]" {...field} />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-[#555] text-xs">
                         Optional description of the event
                     </FormDescription>
                     <FormMessage />
@@ -145,66 +145,72 @@ export default function EventForm({
                 name="isActive"
                 render={({ field }) => (
                     <FormItem>
-                    <div className="flex items-center gap-2">
-                        <FormControl>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                        />
-                        </FormControl>
-                        <FormLabel>Active</FormLabel>
+                    <div className="flex items-center justify-between p-4 rounded-lg border border-[#262626] bg-[#0f0f10]">
+                        <div>
+                            <FormLabel className="text-white font-medium">Active</FormLabel>
+                            <FormDescription className="text-[#555] text-xs mt-0.5">
+                                Inactive events will not be visible for users to book
+                            </FormDescription>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full transition-colors ${
+                                field.value
+                                    ? 'bg-green-500/20 text-green-400'
+                                    : 'bg-[#262626] text-[#555]'
+                            }`}>
+                                {field.value ? 'Active' : 'Inactive'}
+                            </span>
+                            <FormControl>
+                            <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-[#333]"
+                            />
+                            </FormControl>
+                        </div>
                     </div>
-                    <FormDescription>
-                        Inactive events will not be visible for users to book
-                    </FormDescription>
                     </FormItem>
                 )}
                 />
 
-                {/* Buttons section: Delete, Cancel, Save */}
-                <div className="flex gap-2 justify-end">
-                {/* Delete Button (only shows if editing existing event) */}
+                {/* Buttons section */}
+                <div className="flex gap-3 justify-end mt-4 pt-6 border-t border-[#262626]">
+                {/* Delete Button */}
                 {event && (
                     <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <Button
-                        className="cursor-pointer hover:scale-105 hover:bg-red-700"
-                        variant="destructive"
+                        className="cursor-pointer bg-transparent border border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
                         disabled={isDeletePending || form.formState.isSubmitting}
                         >
                         Delete
                         </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="bg-[#161616] border border-[#262626] text-white">
                         <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <AlertDialogTitle className="text-white">Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-[#939393]">
                             This action cannot be undone. This will permanently delete
                             this event.
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border border-[#333] text-white hover:bg-[#262626] hover:text-white">Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                        className="bg-red-500 hover:bg-red-700 cursor-pointer"
+                        className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
                             disabled={isDeletePending || form.formState.isSubmitting}
                             onClick={() => {
-                                // Start a React transition to keep the UI responsive during this async operation
                                 startDeleteTransition(async () => {
                                 try {
-                                    // Attempt to delete the event by its ID
                                     await deleteEvent(event.id)
                                     router.push('/events')
                                 } catch (error: any) {
-                                    // If something goes wrong, show an error at the root level of the form
                                     form.setError("root", {
                                     message: `There was an error deleting your event: ${error.message}`,
                                     })
                                 }
                                 })
                             }}
-                            
-                            
                         >
                             Delete
                         </AlertDialogAction>
@@ -213,19 +219,19 @@ export default function EventForm({
                     </AlertDialog>
                 )}
 
-                {/* Cancel Button - redirects to events list */}
+                {/* Cancel Button */}
                 <Button
                     disabled={isDeletePending || form.formState.isSubmitting}
                     type="button"
                     asChild
-                    variant="outline"
+                    className="bg-transparent border border-[#333] text-white hover:bg-[#262626] hover:text-white transition-colors cursor-pointer"
                 >
                     <Link href="/events">Cancel</Link>
                 </Button>
 
-                {/* Save Button - submits the form */}
+                {/* Save Button */}
                 <Button
-                className="cursor-pointer hover:scale-105 bg-blue-400 hover:bg-blue-600"
+                    className="bg-white hover:bg-gray-200 text-black font-medium transition-colors cursor-pointer"
                     disabled={isDeletePending || form.formState.isSubmitting}
                     type="submit"
                 >

@@ -8,6 +8,13 @@
       "when": 1746659219873,
       "tag": "0000_careful_mesmero",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776350406294,
+      "tag": "0001_spooky_expediter",
+      "breakpoints": true
     }
   ]
 }

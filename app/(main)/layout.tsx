@@ -7,10 +7,8 @@ export default function MainLayout({
   }) {
 
     return (
-        <main className="relative flex">
-            {/* Sidebar for private routes, we should actually move this later if we want public pages to be full screen */}
+        <main className="relative flex min-h-screen bg-[#0f0f10]">
             <PrivateNavBar />
-
             <section className="flex-1 overflow-y-auto">
                 {children}
             </section>

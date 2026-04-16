@@ -1,28 +1,65 @@
 'use client'
 
-import { PrivateNavLinks } from "@/constants";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Clock, Calendar, LinkIcon, Users, Grid, Repeat, Activity, Settings, ExternalLink, Copy, Gift } from "lucide-react";
+import { Clock, Calendar, LinkIcon, ExternalLink, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+
+const PUBLIC_USER_ID = "admin"
 
 export default function PrivateNavBar() {
     const pathname = usePathname();
+    const [copied, setCopied] = useState(false)
 
-    // If it's a public booking route, don't show the sidebar
-    if (pathname.startsWith('/book')) return null;
+    // If it's a public booking route (starts with /book but NOT /bookings), don't show the sidebar
+    if (pathname.startsWith('/book') && !pathname.startsWith('/bookings')) return null;
+
+    const publicUrl = typeof window !== "undefined"
+        ? `${window.location.origin}/book/${PUBLIC_USER_ID}`
+        : `/book/${PUBLIC_USER_ID}`
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(
+                `${window.location.origin}/book/${PUBLIC_USER_ID}`
+            )
+            setCopied(true)
+            toast("Public page link copied!", {
+                className: "!text-green-400 !font-medium",
+                duration: 3000,
+            })
+            setTimeout(() => setCopied(false), 2000)
+        } catch {
+            toast("Failed to copy link")
+        }
+    }
 
     return (
-        <aside className="w-[240px] flex-shrink-0 bg-[#0f0f10] h-screen text-[#939393] flex flex-col justify-between py-6 px-4 border-r border-[#262626] selection:bg-[#fff] selection:text-black">
+        <aside className="w-[240px] flex-shrink-0 bg-[#0f0f10] min-h-screen h-full text-[#939393] flex flex-col justify-between py-6 px-4 border-r border-[#262626]">
             <div>
-              {/* Logo & User profile mock */}
-              <div className="flex items-center gap-3 px-2 mb-8 mt-2 cursor-pointer text-white hover:bg-[#262626] p-2 rounded-md transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
-                      A
+              {/* Logo & Branding */}
+              <div className="flex items-center gap-2.5 px-2 mb-8 mt-2 p-2">
+                  {/* Cal.com-style logo mark */}
+                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm shrink-0">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="3" y="4" width="18" height="17" rx="3" fill="#111"/>
+                          <rect x="3" y="4" width="18" height="7" rx="2" fill="#111"/>
+                          <path d="M8 2v4M16 2v4" stroke="#111" strokeWidth="2" strokeLinecap="round"/>
+                          <rect x="7" y="13" width="3" height="3" rx="0.5" fill="white"/>
+                          <rect x="10.5" y="13" width="3" height="3" rx="0.5" fill="white"/>
+                          <rect x="14" y="13" width="3" height="3" rx="0.5" fill="white"/>
+                      </svg>
                   </div>
-                  <span className="font-medium text-sm">Admin User</span>
+                  <div className="flex flex-col leading-tight">
+                      <span className="text-white font-bold text-sm tracking-tight">Cal</span>
+                      <span className="text-[#555] text-[10px] tracking-wide">by Shubham</span>
+                  </div>
               </div>
+
+              {/* Divider */}
+              <div className="border-t border-[#1e1e1e] mb-4" />
 
               {/* Nav Links */}
               <div className="flex flex-col space-y-1">
@@ -41,36 +78,27 @@ export default function PrivateNavBar() {
                     <Clock size={16} />
                     Availability
                 </Link>
-                
-                {/* Fake links for visual imitation */}
-                <div className="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer">
-                    <div className="flex items-center gap-3"><Users size={16} /> Teams</div>
-                </div>
-                <div className="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer">
-                    <div className="flex items-center gap-3"><Grid size={16} /> Apps</div>
-                </div>
-                <div className="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer">
-                    <div className="flex items-center gap-3"><Repeat size={16} /> Workflows</div>
-                </div>
-                <div className="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer">
-                    <div className="flex items-center gap-3"><Activity size={16} /> Insights</div>
-                </div>
               </div>
             </div>
 
+            {/* Footer links */}
             <div className="flex flex-col space-y-1">
-                <div className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer">
+                <Link
+                    href={`/book/${PUBLIC_USER_ID}`}
+                    target="_blank"
+                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626]"
+                >
                     <ExternalLink size={16} /> View public page
-                </div>
-                <div className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer">
-                    <Copy size={16} /> Copy public page link
-                </div>
-                <div className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer">
-                    <Gift size={16} /> Refer and earn
-                </div>
-                <div className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] cursor-pointer mt-2">
-                    <Settings size={16} /> Settings
-                </div>
+                </Link>
+                <button
+                    onClick={handleCopy}
+                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-white hover:bg-[#262626] text-left w-full"
+                >
+                    {copied
+                        ? <><Check size={16} className="text-green-400" /> <span className="text-green-400">Copied!</span></>
+                        : <><Copy size={16} /> Copy public page link</>
+                    }
+                </button>
             </div>
         </aside>
     )

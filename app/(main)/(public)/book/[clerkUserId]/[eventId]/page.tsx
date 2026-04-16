@@ -1,5 +1,5 @@
 import { getEvent } from "@/server/actions/events";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Calendar } from "lucide-react";
 import {
   addYears,
   eachMinuteOfInterval,
@@ -8,9 +8,8 @@ import {
 } from "date-fns"
 import { getValidTimesFromSchedule } from "@/server/actions/schedule";
 import NoTimeSlots from "@/components/NoTimeSlots";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
 import MeetingForm from "@/components/forms/MeetingForm";
+import Link from "next/link";
 
 export default async function BookingPage({
     params
@@ -20,58 +19,67 @@ export default async function BookingPage({
 
     const { clerkUserId, eventId } = await params
 
-    // Fetch the event details from the database using the provided user and event IDs
     const event = await getEvent(clerkUserId, eventId)
-    // If event doesn't exist, show a 404 page
     if(!event)  return (
-      <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md flex items-center gap-2 text-sm max-w-md mx-auto mt-6">
-        <AlertTriangle className="w-5 h-5" />
-        <span>This event doesn't exist anymore.</span>
+      <div className="bg-[#0f0f10] min-h-screen flex items-center justify-center p-4">
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-xl flex items-center gap-3 text-sm max-w-md w-full">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+          <span>This event doesn't exist anymore.</span>
+        </div>
       </div>
     )
 
-      // Get the full user object from Clerk
-      const calendarUser = { fullName: "Admin User", id: clerkUserId }
+      const calendarUser = { fullName: "Shubham", id: clerkUserId }
 
-     // Define a date range from now (rounded up to the nearest 15 minutes) to 1 year later
     const startDate = roundToNearestMinutes(new Date(), {
       nearestTo: 15,
       roundingMethod: "ceil",
     })
     
-    const endDate = endOfDay(addYears(startDate, 1)) // Set range to 1 year ahead
+    const endDate = endOfDay(addYears(startDate, 1))
 
-     // Generate valid available time slots for the event using the custom scheduler logic
   const validTimes = await getValidTimesFromSchedule(
     eachMinuteOfInterval({ start: startDate, end: endDate }, { step: 15 }),
     event
   )
 
-   // If no valid time slots are available, show a message and an option to pick another event
    if (validTimes.length === 0) {
     return <NoTimeSlots event={event} calendarUser={calendarUser} />
   }
 
-
-  // Render the booking form with the list of valid available times
   return (
-    <Card className="max-w-4xl mx-auto border-8 border-blue-200 shadow-2xl shadow-accent-foreground">
-      <CardHeader>
-        <CardTitle>
-          Book {event.name} with {calendarUser.fullName}
-        </CardTitle>
-        {event.description && (
-          <CardDescription>{event.description}</CardDescription>
-        )}
-      </CardHeader>
-      <CardContent>
-        <MeetingForm
-          validTimes={validTimes}
-          eventId={event.id}
-          clerkUserId={clerkUserId}
-        />
-      </CardContent>
-    </Card>
-  )   
+    <section className="min-h-screen bg-[#0f0f10] text-[#ededed] py-12 px-4 font-sans flex flex-col items-center">
+        {/* Branding Logo */}
+        <Link href={`/book/${clerkUserId}`} className="flex items-center gap-2 mb-10 group">
+          <div className="bg-white p-1 rounded-md">
+            <Calendar className="w-5 h-5 text-black" strokeWidth={2.5} />
+          </div>
+          <span className="font-bold text-white tracking-tight text-lg">
+              Cal <span className="text-[#939393] font-normal text-sm">by Shubham</span>
+          </span>
+        </Link>
 
-  }
+        <div className="border border-[#262626] rounded-2xl bg-[#161616] p-8 md:p-10 text-white w-full max-w-2xl shadow-2xl">
+            <div className="mb-8 border-b border-[#262626] pb-6">
+                <h1 className="text-2xl font-bold tracking-tight mb-2">
+                    {event.name}
+                </h1>
+                <div className="flex items-center gap-2 text-sm text-[#939393]">
+                    <span>with {calendarUser.fullName}</span>
+                    <span>•</span>
+                    <span className="bg-[#262626] px-2 py-0.5 rounded text-xs font-medium">{event.durationInMinutes} min</span>
+                </div>
+                {event.description && (
+                    <p className="text-[#888] mt-4 text-sm leading-relaxed">{event.description}</p>
+                )}
+            </div>
+            
+            <MeetingForm
+                validTimes={validTimes}
+                eventId={event.id}
+                clerkUserId={clerkUserId}
+            />
+        </div>
+    </section>
+  )   
+}

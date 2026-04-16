@@ -1,37 +1,31 @@
 import EventForm from "@/components/forms/EventForm"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getEvent } from "@/server/actions/events"
 
-
-// The default exported async function for the EditEventPage
 export default async function EditEventPage({
-  params,// Extracting the eventId from the URL params
+  params,
 }: {
   params: Promise<{ eventId: string }>
 }) {
-    // Get the current authenticated user and handle the redirect if the user is not logged in
-    // Mock user id
   const userId = "admin"
-
   const { eventId } = await params
-    // Fetch the event from the database using the eventId and the logged-in user's ID
   const event = await getEvent(userId, eventId)
   if(!event) return <h1>Event not found</h1>
 
-    // Render the page with a card layout, displaying the "Edit Event" form
   return (
-    <Card className="max-w-md mx-auto border-4 border-blue-100 shadow-2xl shadow-accent-foreground">
-      <CardHeader>
-        <CardTitle>Edit Event</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Render the EventForm with the event details, passing the event data as props */}
-        <EventForm
-          event={{ ...event, description: event.description || undefined }} // If description is null, pass undefined
-        />
-      </CardContent>
-    </Card>
+        <section className="min-h-screen bg-[#0f0f10] text-[#ededed] p-10 font-sans">
+            <div className="flex flex-col gap-6 max-w-5xl mx-auto">
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-white tracking-tight">Edit event type</h1>
+                    </div>
+                </div>
+
+                <div className="border border-[#262626] rounded-xl bg-[#161616] p-6 md:p-10 text-white max-w-3xl">
+                  <EventForm
+                    event={{ ...event, description: event.description || undefined }}
+                  />
+                </div>
+            </div>
+        </section>
   )
-
-
 }

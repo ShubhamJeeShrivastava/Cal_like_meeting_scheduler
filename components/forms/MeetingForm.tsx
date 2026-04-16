@@ -112,7 +112,7 @@ export default function MeetingForm({
                       <FormLabel>Timezone</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-[#0f0f10] border-[#333] text-white">
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
@@ -145,8 +145,8 @@ export default function MeetingForm({
                               <Button
                                 variant="outline"
                                 className={cn(
-                                  "pl-3 text-left font-normal flex w-full",
-                                  !field.value && "text-muted-foreground"
+                                  "pl-3 text-left font-normal flex w-full bg-[#0f0f10] border-[#333] hover:bg-[#262626] hover:text-white",
+                                  !field.value && "text-gray-400"
                                 )}
                               >
                                 {field.value ? (
@@ -193,7 +193,7 @@ export default function MeetingForm({
                           defaultValue={field.value?.toISOString()}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-[#0f0f10] border-[#333] text-white">
                               <SelectValue
                                 placeholder={
                                   date == null || timezone == null
@@ -232,7 +232,7 @@ export default function MeetingForm({
                       <FormItem className="flex-1">
                         <FormLabel>Your Name</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input className="bg-[#0f0f10] border-[#333] text-white focus-visible:ring-1 focus-visible:ring-[#555]" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -247,7 +247,7 @@ export default function MeetingForm({
                       <FormItem className="flex-1">
                         <FormLabel>Your Email</FormLabel>
                         <FormControl>
-                          <Input type="email" {...field} />
+                          <Input className="bg-[#0f0f10] border-[#333] text-white focus-visible:ring-1 focus-visible:ring-[#555]" type="email" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -263,7 +263,7 @@ export default function MeetingForm({
                     <FormItem>
                       <FormLabel>Notes</FormLabel>
                       <FormControl>
-                        <Textarea className="resize-none" {...field} />
+                        <Textarea className="resize-none bg-[#0f0f10] border-[#333] text-white focus-visible:ring-1 focus-visible:ring-[#555]" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -271,17 +271,18 @@ export default function MeetingForm({
                 />
         
                 {/* Cancel and Submit buttons */}
-                <div className="flex gap-2 justify-end">
+                <div className="flex gap-3 justify-end mt-4 pt-6 border-t border-[#262626]">
                   <Button
                     disabled={form.formState.isSubmitting}
                     type="button"
                     asChild
                     variant="outline"
+                    className="bg-transparent border-[#333] text-white hover:bg-[#262626] hover:text-white transition-colors"
                   >
                     <Link href={`/book/${clerkUserId}`}>Cancel</Link>
                   </Button>
                   <Button 
-                  className="cursor-pointer hover:scale-105 bg-blue-400 hover:bg-blue-600"
+                  className="bg-white hover:bg-gray-200 text-black px-6 font-medium transition-colors cursor-pointer"
                   disabled={form.formState.isSubmitting} 
                   type="submit">
                     Book Event

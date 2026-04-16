@@ -1,65 +1,94 @@
 'use server'
 
 import { db } from "@/drizzle/db";
+import { MeetingTable } from "@/drizzle/schema";
 import { meetingActionSchema } from "@/schema/meetings";
 import { fromZonedTime } from "date-fns-tz";
 import { getValidTimesFromSchedule } from "./schedule";
 import { createCalendarEvent } from "../google/googleCalendar";
 import { z } from "zod";
+import { addMinutes } from "date-fns";
+import { eq, and } from "drizzle-orm";
 
-//Server action to create a meeting
+// Server action to create a meeting and save it to the database
 export async function createMeeting(
-  unsafeData: z.infer<typeof meetingActionSchema> // Incoming data, inferred from the meetingActionSchema
+  unsafeData: z.infer<typeof meetingActionSchema>
 ) {
-
-
   try {
-    // Validate the incoming data against the schema
     const { success, data } = meetingActionSchema.safeParse(unsafeData);
+    if (!success) throw new Error("Invalid data.");
 
-    // If validation fails, throw an error
-    if (!success) {
-      throw new Error("Invalid data.");
-    }
-
-    // Try to find the event in the database that matches the provided IDs and is active
+    // Find the event in the database
     const event = await db.query.EventTable.findFirst({
       where: ({ clerkUserId, isActive, id }, { eq, and }) =>
         and(
-          eq(isActive, true), // Event must be active
-          eq(clerkUserId, data.clerkUserId), // Belonging to the right user
-          eq(id, data.eventId) // Matching the event ID
+          eq(isActive, true),
+          eq(clerkUserId, data.clerkUserId),
+          eq(id, data.eventId)
         ),
     });
 
-    // If no matching event is found, throw an error
-    if (!event) {
-      throw new Error("Event not found.");
-    }
+    if (!event) throw new Error("Event not found.");
 
-    // Interpret the start time as being in the user's timezone and convert it to a UTC Date
     const startInTimezone = fromZonedTime(data.startTime, data.timezone);
 
-    // Check if the selected time is valid for the event's availability
     const validTimes = await getValidTimesFromSchedule([startInTimezone], event);
+    if (validTimes.length === 0) throw new Error("Selected time is not valid.");
 
-    // If the selected time is not valid, throw an error
-    if (validTimes.length === 0) {
-      throw new Error("Selected time is not valid.");
-    }
-
-    // Create the Google Calendar event with all necessary details
-    await createCalendarEvent({
-      ...data, // guest info, timezone, etc.
-      startTime: startInTimezone, // adjusted to the right timezone
-      durationInMinutes: event.durationInMinutes, // use duration from the event
-      eventName: event.name, // use event name from DB
+    // Save the meeting to the database
+    await db.insert(MeetingTable).values({
+      eventId: event.id,
+      clerkUserId: data.clerkUserId,
+      guestName: data.guestName,
+      guestEmail: data.guestEmail,
+      guestNotes: data.guestNotes ?? null,
+      startTime: startInTimezone,
+      durationInMinutes: event.durationInMinutes,
+      timezone: data.timezone,
+      eventName: event.name,
     });
-    return {clerkUserId: data.clerkUserId, eventId : data.eventId, startTime: data.startTime}
+
+    // Also try to create a Google Calendar event (stubbed out, won't fail)
+    await createCalendarEvent({
+      ...data,
+      startTime: startInTimezone,
+      durationInMinutes: event.durationInMinutes,
+      eventName: event.name,
+    });
+
+    return { clerkUserId: data.clerkUserId, eventId: data.eventId, startTime: data.startTime };
   } catch (error: any) {
-    // Log the error message (or handle it based on your need)
     console.error(`Error creating meeting: ${error.message || error}`);
-    // Optionally throw the error to be handled further upstream
     throw new Error(`Failed to create meeting: ${error.message || error}`);
+  }
+}
+
+// Server action to fetch all bookings for the admin user
+export async function getBookings() {
+  const userId = "admin";
+  return db.query.MeetingTable.findMany({
+    where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
+    orderBy: ({ startTime }, { desc }) => [desc(startTime)],
+  });
+}
+
+// Server action to delete a booking
+export async function cancelMeeting(id: string) {
+  try {
+    const userId = "admin";
+    
+    const result = await db
+      .delete(MeetingTable)
+      .where(
+        and(
+          eq(MeetingTable.id, id),
+          eq(MeetingTable.clerkUserId, userId)
+        )
+      );
+
+    return { success: true };
+  } catch (error: any) {
+    console.error(`Error deleting meeting: ${error.message || error}`);
+    throw new Error(`Failed to delete meeting: ${error.message || error}`);
   }
 }

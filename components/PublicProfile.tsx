@@ -1,119 +1,84 @@
-'use client'
+import { getPublicEvents } from "@/server/actions/events"
+import { Clock } from "lucide-react"
+import Link from "next/link"
 
-import { getPublicEvents, PublicEvent } from "@/server/actions/events"
-import { useEffect, useState } from "react"
-import Loading from "./Loading"
-import { Copy, Eye } from "lucide-react"
-
-import { Button } from "./ui/button"
-import { toast } from "sonner"
-import PublicEventCard from "./PublicEventCard"
-
-// Define types for the props that PublicProfile component will receive
 type PublicProfileProps = {
-    userId: string // The user ID for the profile
-    fullName: string | null // User's full name
-  }
+  userId: string
+  fullName: string | null
+}
 
+export default async function PublicProfile({ userId, fullName }: PublicProfileProps) {
+  const events = await getPublicEvents(userId)
 
-  export default function PublicProfile({ userId, fullName }: PublicProfileProps) {
-
-    // State to store events and loading state
-    const [events, setEvents] = useState<PublicEvent[] | null>(null)
-    const user = { id: "admin" }
-
-
-  const copyProfileUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}/book/${userId}`)
-      toast("Profile URL copied to clipboard!")
-    } catch (error) {
-      console.error("Failed to copy URL:", error)
-    }
-  }
-  
-
-  // Fetch events when the component mounts
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const fetchedEvents = await getPublicEvents(userId) // Call the action to get public events
-        setEvents(fetchedEvents) // Set the events state
-      } catch (error) {
-        console.error("Error fetching events:", error)
-        setEvents([]) // Optionally, set an empty array in case of an error
-      }
-    }
-
-    fetchEvents() // Fetch events on component mount
-  }, [userId]) // Only refetch events when userId changes
-
-
-      // Render loading component if events are not yet fetched
-    if (events === null) {
-        return (
-          <div className="max-w-5xl mx-auto text-center">
-            <Loading />
+  return (
+    <div className="min-h-screen bg-[#0f0f10] text-white">
+      {/* Top profile hero */}
+      <div className="border-b border-[#1e1e1e] py-14 px-4">
+        <div className="max-w-lg mx-auto flex flex-col items-center text-center">
+          {/* Cal.com-style logo mark */}
+          <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-5 shadow-xl ring-1 ring-white/10">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="4" width="18" height="17" rx="3" fill="#111"/>
+              <rect x="3" y="4" width="18" height="7" rx="2" fill="#111"/>
+              <path d="M8 2v4M16 2v4" stroke="#111" strokeWidth="2" strokeLinecap="round"/>
+              <rect x="7" y="13" width="3" height="3" rx="0.5" fill="white"/>
+              <rect x="10.5" y="13" width="3" height="3" rx="0.5" fill="white"/>
+              <rect x="14" y="13" width="3" height="3" rx="0.5" fill="white"/>
+            </svg>
           </div>
-        )
-      }
-
-    return (
-        <div className="max-w-5xl mx-auto p-5">
-
-                {user?.id === userId && (
-                // Info message with Eye icon (for profile owner only)
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4 font-bold">
-                    <Eye className="w-4 h-4" />
-                    <p>This is how people will see your public profile</p>
-                </div>
-                )}
-
-            {/* Display user's name */}
-            <div className="text-4xl md:text-5xl font-black mb-4 text-center">
-                {fullName}
-            </div>
-
-            {/* Copy Public Profile URL Button */}
-            {user?.id === userId && (
-                <div className="flex justify-center mb-6">
-                <Button
-                    className="cursor-pointer"
-                    variant={"outline"}
-                    onClick={copyProfileUrl}
-                >
-                    <Copy className="size-4" />
-                    Copy Public Profile URL
-                </Button>
-                </div>
-            )}
-
-            {/* Welcome message */}
-            <div className="text-muted-foreground mb-6 max-w-sm mx-auto text-center">
-                <p className="font-bold text-2xl">
-                Time to meet!🧑‍🤝‍🧑
-                </p>
-                <br /> Pick an event and let’s make it official by booking a time.
-            </div>
-
-
-            {/* Grid of public event cards */}
-            {events.length === 0 ? (
-                <div className="text-center text-muted-foreground">
-                No events available at the moment.
-                </div>
-            ) : (
-                <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
-                {events.map((event) => (
-                    // Render a card for each event
-                    <PublicEventCard key={event.id} {...event} />
-                ))}
-                </div>
-            )}
-
-
+          {/* Name */}
+          <h1 className="text-2xl font-bold text-white tracking-tight mb-1">{fullName}</h1>
+          <p className="text-[#555] text-xs tracking-widest uppercase font-medium mb-3">Cal by Shubham</p>
+          {/* Tagline */}
+          <p className="text-[#939393] text-sm max-w-xs">
+            Welcome! Pick an event below to book a time with me.
+          </p>
         </div>
-    )
-    
+      </div>
 
-  }
+      {/* Event list */}
+      <div className="max-w-lg mx-auto py-10 px-4 flex flex-col gap-4">
+        {events.length === 0 ? (
+          <div className="text-center text-[#555] py-20">
+            <p className="text-lg font-medium text-white mb-1">No events available</p>
+            <p className="text-sm">Check back later.</p>
+          </div>
+        ) : (
+          events.map(event => (
+            <Link
+              key={event.id}
+              href={`/book/${userId}/${event.id}`}
+              className="group block border border-[#262626] hover:border-[#444] rounded-xl bg-[#161616] hover:bg-[#1a1a1a] p-5 transition-all duration-200"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="font-semibold text-white text-base tracking-tight group-hover:text-white mb-2">
+                    {event.name}
+                  </h2>
+                  <div className="flex items-center gap-1.5 text-[#939393] text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span>{event.durationInMinutes} min</span>
+                  </div>
+                  {event.description && (
+                    <p className="text-[#666] text-sm mt-2 line-clamp-2">{event.description}</p>
+                  )}
+                </div>
+                {/* Arrow */}
+                <div className="text-[#555] group-hover:text-white transition-colors mt-1 ml-4 shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="text-center pb-8 text-[#333] text-xs">
+        Powered by <span className="text-[#555]">Cal by Shubham</span>
+      </div>
+    </div>
+  )
+}
