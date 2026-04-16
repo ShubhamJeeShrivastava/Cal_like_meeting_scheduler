@@ -84,7 +84,7 @@ npm run db:studio  # Open Drizzle Studio to inspect data
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to see the application in action.
+Open the app in your browser to see it in action.
 
 ---
 
