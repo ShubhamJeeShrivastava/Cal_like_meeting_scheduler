@@ -3,13 +3,19 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Clock, Calendar, LinkIcon, ExternalLink, Copy, Check } from "lucide-react";
+import { Clock, Calendar, LinkIcon, ExternalLink, Copy, Check, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const PUBLIC_USER_ID = "admin"
 
-export default function PrivateNavBar() {
+type PrivateNavBarProps = {
+  className?: string
+  showCloseButton?: boolean
+  onClose?: () => void
+}
+
+export default function PrivateNavBar({ className, showCloseButton, onClose }: PrivateNavBarProps) {
     const pathname = usePathname();
     const [copied, setCopied] = useState(false)
 
@@ -37,7 +43,12 @@ export default function PrivateNavBar() {
     }
 
     return (
-        <aside className="w-[240px] flex-shrink-0 bg-[#0f0f10] text-[#939393] border-r border-[#262626] sticky top-0 h-screen flex flex-col">
+        <aside
+          className={cn(
+            "w-[240px] flex-shrink-0 bg-[#0f0f10] text-[#939393] border-r border-[#262626] h-screen flex flex-col",
+            className
+          )}
+        >
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto py-6 px-4">
               {/* Logo & Branding */}
@@ -57,6 +68,17 @@ export default function PrivateNavBar() {
                       <span className="text-white font-bold text-sm tracking-tight">Cal</span>
                       <span className="text-[#555] text-[10px] tracking-wide">by Shubham</span>
                   </div>
+
+                  {showCloseButton && (
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      aria-label="Close menu"
+                      className="ml-auto inline-flex items-center justify-center rounded-md p-2 text-[#939393] hover:text-white hover:bg-[#262626] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                    >
+                      <X size={18} />
+                    </button>
+                  )}
               </div>
 
               {/* Divider */}

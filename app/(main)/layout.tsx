@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic"
-import PrivateNavBar from "@/components/PrivateNavBar"
+import MainShell from "@/components/MainShell"
 
 export default function MainLayout({
     children,
@@ -8,11 +8,8 @@ export default function MainLayout({
   }) {
 
     return (
-        <main className="relative flex min-h-screen bg-[#0f0f10]">
-            <PrivateNavBar />
-            <section className="flex-1 overflow-y-auto">
-                {children}
-            </section>
-        </main>
+        <MainShell>
+          {children}
+        </MainShell>
     )
 }

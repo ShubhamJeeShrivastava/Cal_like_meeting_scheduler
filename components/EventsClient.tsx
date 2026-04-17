@@ -24,29 +24,29 @@ export default function EventsClient({ events }: { events: Event[] }) {
   )
 
   return (
-    <section className="min-h-screen bg-[#0f0f10] text-[#ededed] p-10 font-sans">
+    <section className="min-h-screen bg-[#0f0f10] text-[#ededed] p-4 sm:p-6 md:p-10 font-sans">
       <div className="flex flex-col gap-6 max-w-5xl mx-auto">
 
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div className="min-w-0">
             <h1 className="text-2xl font-semibold text-white tracking-tight">Event types</h1>
             <p className="text-sm text-[#939393] mt-1">Configure different events for people to book on your calendar.</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full md:w-auto">
             {/* Live Search Input */}
-            <div className="flex items-center bg-[#161616] border border-[#262626] rounded-md px-3 py-1.5 gap-2 focus-within:border-[#555] transition-colors">
+            <div className="flex items-center bg-[#161616] border border-[#262626] rounded-md px-3 py-2 gap-2 focus-within:border-[#555] transition-colors w-full sm:w-auto">
               <Search className="w-4 h-4 text-[#939393] shrink-0" />
               <input
                 type="text"
                 placeholder="Search..."
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="bg-transparent text-sm text-white placeholder:text-[#555] outline-none w-40 focus:w-52 transition-all duration-300"
+                className="bg-transparent text-sm text-white placeholder:text-[#555] outline-none w-full sm:w-48 sm:focus:w-56 transition-[width] duration-200"
               />
             </div>
             <Button
-              className="bg-white hover:bg-gray-100 text-black px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer"
+              className="bg-white hover:bg-gray-100 text-black px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer w-full sm:w-auto"
               asChild>
               <Link href="/events/new">
                 <Plus className="mr-1 h-4 w-4" /> New
