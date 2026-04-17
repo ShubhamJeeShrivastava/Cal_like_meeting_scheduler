@@ -8,5 +8,7 @@ export default function Loading() {
       <Mosaic color={["#32cd32", "#327fcd", "#cd32cd", "#cd8032"]} size="large" text="Loading..." textColor="black" />
     </div>
   );
+
+  
 };
 

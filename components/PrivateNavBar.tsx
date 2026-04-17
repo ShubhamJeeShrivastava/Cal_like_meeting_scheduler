@@ -37,8 +37,9 @@ export default function PrivateNavBar() {
     }
 
     return (
-        <aside className="w-[240px] flex-shrink-0 bg-[#0f0f10] min-h-screen h-full text-[#939393] flex flex-col justify-between py-6 px-4 border-r border-[#262626]">
-            <div>
+        <aside className="w-[240px] flex-shrink-0 bg-[#0f0f10] text-[#939393] border-r border-[#262626] sticky top-0 h-screen flex flex-col">
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto py-6 px-4">
               {/* Logo & Branding */}
               <div className="flex items-center gap-2.5 px-2 mb-8 mt-2 p-2">
                   {/* Cal.com-style logo mark */}
@@ -82,7 +83,7 @@ export default function PrivateNavBar() {
             </div>
 
             {/* Footer links */}
-            <div className="flex flex-col space-y-1">
+            <div className="flex flex-col space-y-1 py-4 px-4 border-t border-[#1e1e1e] bg-[#0f0f10]">
                 <Link
                     href={`/book/${PUBLIC_USER_ID}`}
                     target="_blank"
