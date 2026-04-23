@@ -104,3 +104,15 @@ Contributions are welcome! If you have suggestions for new features or infrastru
 **Built with ❤️ by [Shubham Jee Shrivastava](https://github.com/ShubhamJeeShrivastava)**
 
 *This project was developed as a production-grade demonstration of full-stack engineering capabilities using modern web technologies.*
+
+---
+
+## 📊 Database Schema
+
+The application uses a relational schema designed for scalability and performance:
+
+- **`events`**: Stores unique event profiles (e.g., "Technical Discovery") created by the host, including duration and status.
+- **`schedules`**: Maintains host-specific configurations, such as their primary timezone and linked user identity.
+- **`scheduleAvailabilities`**: Detailed time-slot rules for each day of the week, governing when a host can be booked.
+- **`meetings`**: Persists all successful bookings, linking guests to specific events and capturing session details.
+
