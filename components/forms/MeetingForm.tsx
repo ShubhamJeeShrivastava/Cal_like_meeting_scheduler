@@ -83,7 +83,7 @@ export default function MeetingForm({
             }
 
             // Initialize the path variable to use it later in the finally block
-            const path = `/book/${result.data.clerkUserId}/${result.data.eventId}/success?startTime=${result.data.startTime.toISOString()}`;
+            const path = `/book/${result.data.clerkUserId}/${result.data.eventId}/success?startTime=${result.data.startTime.toISOString()}&timezone=${values.timezone}`;
             router.push(path)
     
         } catch (error: any) {

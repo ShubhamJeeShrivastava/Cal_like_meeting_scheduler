@@ -1,19 +1,20 @@
 // This code defines a **Next.js server component** that displays a success page after a user books an event. It takes in URL parameters (`clerkUserId` and `eventId`) and a query parameter (`startTime`), then queries the database for a matching active event. If no event is found, it shows a 404 page. Otherwise, it fetches the user's details from Clerk, formats the provided `startTime` into a readable format, and displays a confirmation message indicating the event name, the user's full name, and the scheduled time. It also informs the user that an email confirmation will be sent, signaling that the booking was successful.
 
-import { formatDateTime } from "@/lib/formatters";
 import { getEvent } from "@/server/actions/events";
 import { AlertTriangle, CheckCircle2, Calendar } from "lucide-react";
 import Link from "next/link";
+import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
 export default async function SuccessPage({
     params,
     searchParams,
 }: {
     params: Promise<{ clerkUserId: string; eventId: string }>
-    searchParams: Promise<{ startTime: string }>
+    searchParams: Promise<{ startTime: string, timezone?: string }>
 }) {
     const { clerkUserId, eventId } = await params
-    const { startTime } = await searchParams
+    const { startTime, timezone } = await searchParams
     
     const event = await getEvent(clerkUserId, eventId)
     
@@ -28,6 +29,7 @@ export default async function SuccessPage({
 
     const calendarUser = { fullName: "Shubham", id: clerkUserId }
     const startTimeDate = new Date(startTime)
+    const zonedStartTime = timezone ? toZonedTime(startTimeDate, timezone) : startTimeDate;
 
     return (
         <section className="min-h-screen bg-[#0f0f10] text-[#ededed] py-12 px-4 font-sans flex flex-col items-center justify-center">
@@ -51,7 +53,7 @@ export default async function SuccessPage({
                         <span className="font-semibold text-white">{event.name}</span>
                     </div>
                     <p className="text-sm text-[#939393]">
-                        {formatDateTime(startTimeDate)}
+                        {format(zonedStartTime, "MMM d, yyyy")} at {format(zonedStartTime, "h:mm a")} {timezone ? `(${timezone})` : ''}
                     </p>
                 </div>
 

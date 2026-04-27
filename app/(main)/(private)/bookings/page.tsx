@@ -1,6 +1,7 @@
 import { getBookings, type BookingRow } from "@/server/actions/meetings";
 import { CalendarRange, Clock, User, Mail } from "lucide-react";
 import { format, isFuture, isPast } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { DeleteBookingButton } from "@/components/DeleteBookingButton";
 
 export default async function BookingsPage() {
@@ -71,6 +72,8 @@ function BookingRow({ booking }: { booking: {
     durationInMinutes: number
     timezone: string
 }}) {
+    const zonedStartTime = toZonedTime(booking.startTime, booking.timezone);
+
     return (
         <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#1a1a1a] transition-colors relative group">
             <div className="flex flex-col gap-2">
@@ -96,11 +99,11 @@ function BookingRow({ booking }: { booking: {
                 <div className="flex flex-col items-start md:items-end gap-1 text-sm text-[#939393] shrink-0">
                     <div className="flex items-center gap-1.5 text-white font-medium">
                         <CalendarRange className="w-4 h-4 text-[#939393]" />
-                        {format(booking.startTime, "MMM d, yyyy")}
+                        {format(zonedStartTime, "MMM d, yyyy")}
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5" />
-                        {format(booking.startTime, "h:mm a")} · {booking.timezone}
+                        {format(zonedStartTime, "h:mm a")} · {booking.timezone}
                     </div>
                 </div>
 
