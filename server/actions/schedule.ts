@@ -3,10 +3,10 @@
 'use server'
 import { fromZonedTime } from "date-fns-tz"
 import { getDb } from "@/drizzle/db"
-import { ScheduleAvailabilityTable, ScheduleTable } from "@/drizzle/schema"
+import { MeetingTable, ScheduleAvailabilityTable, ScheduleTable } from "@/drizzle/schema"
 import { scheduleFormSchema } from "@/schema/schedule"
 
-import { eq } from "drizzle-orm"
+import { and, eq, gte, lte } from "drizzle-orm"
 import { BatchItem } from "drizzle-orm/batch"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -140,6 +140,23 @@ export async function getValidTimesFromSchedule(
     end,
   })
 
+  const searchStart = addMinutes(start, -1440) // 24 hours before start to catch overlapping meetings
+  const dbMeetings = await db.query.MeetingTable.findMany({
+    where: ({ clerkUserId, startTime }, { eq, and, gte, lte }) =>
+      and(
+        eq(clerkUserId, userId),
+        gte(startTime, searchStart),
+        lte(startTime, end)
+      ),
+  })
+
+  const dbEventTimes = dbMeetings.map(meeting => ({
+    start: meeting.startTime,
+    end: addMinutes(meeting.startTime, meeting.durationInMinutes)
+  }))
+
+  const allEventTimes = [...eventTimes, ...dbEventTimes]
+
   // Filter and return only valid time slots based on availability and conflicts
   return timesInOrder.filter(intervalDate => {
      // Get the user's availabilities for the specific day, adjusted to their timezone
@@ -158,8 +175,8 @@ export async function getValidTimesFromSchedule(
 
   // Keep only the time slots that satisfy two conditions:
     return (
-    // 1. This time slot does not overlap with any existing calendar events
-    eventTimes.every(eventTime => {
+    // 1. This time slot does not overlap with any existing calendar events or database meetings
+    allEventTimes.every(eventTime => {
       return !areIntervalsOverlapping(eventTime, eventInterval)
     }) &&
     // 2. The entire proposed event fits within at least one availability window

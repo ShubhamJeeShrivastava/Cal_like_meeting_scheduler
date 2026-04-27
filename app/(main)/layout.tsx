@@ -2,14 +2,14 @@ export const dynamic = "force-dynamic"
 import MainShell from "@/components/MainShell"
 
 export default function MainLayout({
-    children,
-  }: {
-    children: React.ReactNode
-  }) {
+  children,
+}: {
+  children: React.ReactNode
+}) {
 
-    return (
-        <MainShell>
-          {children}
-        </MainShell>
-    )
+  return (
+    <MainShell>
+      {children}
+    </MainShell>
+  )
 }
