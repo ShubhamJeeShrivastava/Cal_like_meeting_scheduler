@@ -159,37 +159,24 @@ export async function getValidTimesFromSchedule(
 
   // Filter and return only valid time slots based on availability and conflicts
   return timesInOrder.filter(intervalDate => {
-     // Get the user's availabilities for the specific day, adjusted to their timezone
     const availabilities = getAvailabilities(
       groupedAvailabilities,
       intervalDate,
       schedule.timezone
     )
 
+    const eventInterval = {
+      start: intervalDate,
+      end: addMinutes(intervalDate, durationInMinutes),
+    }
 
-  // Define the time range for a potential event starting at this interval
-  const eventInterval = {
-    start: intervalDate, // Proposed start time
-    end: addMinutes(intervalDate, durationInMinutes), // Proposed end time (start + duration)
-  }
-
-  // Keep only the time slots that satisfy two conditions:
     return (
-    // 1. This time slot does not overlap with any existing calendar events or database meetings
-    allEventTimes.every(eventTime => {
-      return !areIntervalsOverlapping(eventTime, eventInterval)
-    }) &&
-    // 2. The entire proposed event fits within at least one availability window
-    availabilities.some(availability => {
-      return (
-        isWithinInterval(eventInterval.start, availability) && // Start is inside availability
-        isWithinInterval(eventInterval.end, availability) // End is inside availability
+      allEventTimes.every(eventTime => !areIntervalsOverlapping(eventTime, eventInterval)) &&
+      availabilities.some(availability => 
+        isWithinInterval(eventInterval.start, availability) && 
+        isWithinInterval(eventInterval.end, availability)
       )
-    })
-  )
-
-
-
+    )
   })
 
 
