@@ -1,21 +1,20 @@
-# Cal by Shubham
+# 📅 Cal by Shubham
 
-## Live Demo
-
-[`https://cal-like-meeting-scheduler-by-shubham-jee.vercel.app/`](https://cal-like-meeting-scheduler-by-shubham-jee.vercel.app/)
+![Status](https://img.shields.io/badge/Status-Production--Ready-success?style=for-the-badge&logo=vercel&color=000)
+![Tech Stack](https://img.shields.io/badge/Built%20With-Next.js%20%7C%20TypeScript%20%7C%20Drizzle%20%7C%20Neon-blue?style=for-the-badge)
 
 A high-performance, professional scheduling platform built for modern workflows. **Cal by Shubham** enables individuals and organizations to manage their availability, coordinate meetings, and streamline their booking process with a premium, focused user experience.
 
-![Brand Logo](https://img.shields.io/badge/Status-Production--Ready-success?style=for-the-badge&logo=vercel&color=000)
-![Tech Stack](https://img.shields.io/badge/Built%20With-Next.js%20%7C%20TypeScript%20%7C%20Drizzle%20%7C%20Neon-blue?style=for-the-badge)
+🔗 **[Live Demo](https://cal-like-meeting-scheduler-by-shubham-jee.vercel.app/)**
+
+---
 
 ## ✨ Overview
 
 Cal by Shubham is a full-stack scheduling solution designed to eliminate the back-and-forth of meeting coordination. It provides a sleek, dark-themed dashboard for managing "Event Types" (recurring meeting profiles with specific durations and descriptions) and a robust availability engine that ensures your guests only book times when you are actually free.
 
 ### Key Features
-
-- **🎯 Event Management**: Create, edit, and disable multiple event types (e.g., "15-min Intro," "Product Discovery," "Technical Interview").
+- **🎯 Event Management**: Create, edit, and disable multiple event types (e.g., "15-min Intro", "Product Discovery").
 - **📅 Dynamic Availability**: Set granular weekly schedules. Define global availability or customize specific slots for each day.
 - **🔒 Secure Public Profiles**: A beautiful, branded public landing page where guests can view your services and book time instantly.
 - **⚡ Real-time Conflict Resolution**: Built-in logic to ensure overlapping bookings are impossible.
@@ -26,14 +25,26 @@ Cal by Shubham is a full-stack scheduling solution designed to eliminate the bac
 
 ## 🚀 Tech Stack
 
-- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router, Server Components, Server Actions)
-- **Language**: [TypeScript](https://www.typescriptlang.org/) for end-to-end type safety.
-- **Database**: [PostgreSQL](https://www.postgresql.org/) (Hosted on [Neon](https://neon.tech/)).
-- **ORM**: [Drizzle ORM](https://orm.drizzle.team/) for high-performance database queries.
-- **Authentication**: [Clerk](https://clerk.com/) for secure user management and social identity.
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with a custom design system.
-- **Icons**: [Lucide React](https://lucide.dev/).
-- **Validation**: [Zod](https://zod.dev/) for robust schema validation.
+| Category | Technology |
+|---|---|
+| **Framework** | [Next.js 15+](https://nextjs.org/) (App Router, Server Components, Server Actions) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) |
+| **Database** | [PostgreSQL](https://www.postgresql.org/) hosted on [Neon](https://neon.tech/) |
+| **ORM** | [Drizzle ORM](https://orm.drizzle.team/) |
+| **Authentication** | [Clerk](https://clerk.com/) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) & [Lucide React](https://lucide.dev/) |
+| **Validation** | [Zod](https://zod.dev/) |
+
+---
+
+## 📊 Database Schema
+
+The application uses a relational schema designed for scalability and performance:
+
+- **`events`**: Stores unique event profiles created by the host, including duration and status.
+- **`schedules`**: Maintains host-specific configurations, such as primary timezone and linked user identity.
+- **`scheduleAvailabilities`**: Detailed time-slot rules for each day of the week, governing when a host can be booked.
+- **`meetings`**: Persists all successful bookings, linking guests to specific events and capturing session details.
 
 ---
 
@@ -56,8 +67,8 @@ Cal by Shubham is a full-stack scheduling solution designed to eliminate the bac
 
 ### 1. Prerequisites
 - Node.js 18.x or higher
-- A Neon PostgreSQL database instance
-- A Clerk account for authentication
+- A [Neon](https://neon.tech/) PostgreSQL database instance
+- A [Clerk](https://clerk.com/) account for authentication
 
 ### 2. Installation
 ```bash
@@ -84,7 +95,7 @@ npm run db:studio  # Open Drizzle Studio to inspect data
 ```bash
 npm run dev
 ```
-Open the app in your browser to see it in action.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ---
 
@@ -95,6 +106,8 @@ Cal by Shubham is built on the principle of **Visual Excellence**. Unlike generi
 - **Interaction Feedback**: Meaningful hover states and loading transitions using `framer-motion` and Tailwind animations.
 - **Minimalist Layout**: Reducing cognitive load for guests during the booking process.
 
+---
+
 ## 🤝 Contribution
 
 Contributions are welcome! If you have suggestions for new features or infrastructure improvements, please open an issue or submit a pull request.
@@ -104,15 +117,3 @@ Contributions are welcome! If you have suggestions for new features or infrastru
 **Built with ❤️ by [Shubham Jee Shrivastava](https://github.com/ShubhamJeeShrivastava)**
 
 *This project was developed as a production-grade demonstration of full-stack engineering capabilities using modern web technologies.*
-
----
-
-## 📊 Database Schema
-
-The application uses a relational schema designed for scalability and performance:
-
-- **`events`**: Stores unique event profiles (e.g., "Technical Discovery") created by the host, including duration and status.
-- **`schedules`**: Maintains host-specific configurations, such as their primary timezone and linked user identity.
-- **`scheduleAvailabilities`**: Detailed time-slot rules for each day of the week, governing when a host can be booked.
-- **`meetings`**: Persists all successful bookings, linking guests to specific events and capturing session details.
-
